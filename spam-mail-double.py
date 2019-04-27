@@ -166,7 +166,7 @@ def do_dccnn(trainX, testX, trainY, testY):
 
 def do_cnn_wordbag(trainX, testX, trainY, testY):
     global max_document_length
-    print "CNN and tf"
+    print "CNN"
 
     trainX = pad_sequences(trainX, maxlen=max_document_length, value=0.)
     testX = pad_sequences(testX, maxlen=max_document_length, value=0.)
@@ -190,7 +190,7 @@ def do_cnn_wordbag(trainX, testX, trainY, testY):
     # Training
     model = tflearn.DNN(network, tensorboard_verbose=0)
     model.fit(trainX, trainY,
-              n_epoch=5, shuffle=True, validation_set=(testX, testY),
+              n_epoch=20, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=100,run_id="spam")
 
 # def do_rnn_wordbag(trainX, testX, trainY, testY):
@@ -274,19 +274,19 @@ if __name__ == "__main__":
 #     x,y=get_features_by_wordbag()
 #     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
 
-    print "get_features_by_wordbag_tfidf"
-    x,y=get_features_by_wordbag_tfidf()
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
+#     print "get_features_by_wordbag_tfidf"
+#     x,y=get_features_by_wordbag_tfidf()
+#     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
 
 
 #     print "get_features_by_tf"
 #     x,y=get_features_by_tf()
 #     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
     
-#     print "get_features_by_2gram_tfidf" 
-#     x,y=get_features_by_2gram_tfidf()
-#     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
+    print "get_features_by_2gram_tfidf" 
+    x,y=get_features_by_2gram_tfidf()
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
     # CNN
-    #do_cnn_wordbag(x_train, x_test, y_train, y_test)
-    do_dccnn(x_train, x_test, y_train, y_test)
+    do_cnn_wordbag(x_train, x_test, y_train, y_test)
+#     do_dccnn(x_train, x_test, y_train, y_test)
     #show_diffrent_max_features()
