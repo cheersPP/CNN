@@ -109,7 +109,7 @@ def do_metrics(y_test,y_pred):
     print "metrics.f1_score:" 
     print metrics.f1_score(y_test,y_pred) 
     
-def do_cnn_wordbag(trainX, testX, trainY, testY):
+def do_cnn_tf(trainX, testX, trainY, testY):
     global max_document_length
     print "CNN"
 
@@ -145,4 +145,4 @@ if __name__ == "__main__":
     print "get_features_by_tf"
     x,y=get_features_by_tf()
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
-    do_cnn_wordbag(x_train, x_test, y_train, y_test)
+    do_cnn_tf(x_train, x_test, y_train, y_test)
