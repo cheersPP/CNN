@@ -50,7 +50,7 @@ def load_files_from_dir(rootdir):
 def load_all_files():
     ham=[]
     spam=[]
-    for i in range(1,7):
+    for i in range(1,2):
         path="../data/mail/enron%d/ham/" % i
         print "Load %s" % path
         ham+=load_files_from_dir(path)
@@ -161,7 +161,7 @@ def do_dccnn(trainX, testX, trainY, testY):
     # Training
     model = tflearn.DNN(network, tensorboard_verbose=0)
     model.fit(trainX, trainY,
-              n_epoch=10, shuffle=True, validation_set=(testX, testY),
+              n_epoch=50, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=100,run_id="spam")
 
 def do_cnn_wordbag(trainX, testX, trainY, testY):
