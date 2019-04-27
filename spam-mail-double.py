@@ -50,7 +50,7 @@ def load_files_from_dir(rootdir):
 def load_all_files():
     ham=[]
     spam=[]
-    for i in range(1,2):
+    for i in range(1,7):
         path="../data/mail/enron%d/ham/" % i
         print "Load %s" % path
         ham+=load_files_from_dir(path)
@@ -289,4 +289,4 @@ if __name__ == "__main__":
     # CNN
     #do_cnn_wordbag(x_train, x_test, y_train, y_test)
     do_dccnn(x_train, x_test, y_train, y_test)
-    show_diffrent_max_features()
+    #show_diffrent_max_features()
