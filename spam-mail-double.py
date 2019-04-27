@@ -50,7 +50,7 @@ def load_files_from_dir(rootdir):
 def load_all_files():
     ham=[]
     spam=[]
-    for i in range(1,2):
+    for i in range(1,7):
         path="../data/mail/enron%d/ham/" % i
         print "Load %s" % path
         ham+=load_files_from_dir(path)
@@ -141,22 +141,27 @@ def do_dccnn(trainX, testX, trainY, testY):
     branch11 = conv_1d(network, 128, 3, padding='valid', activation='relu', regularizer="L2")
     branch12 = conv_1d(network, 128, 4, padding='valid', activation='relu', regularizer="L2")
     branch13 = conv_1d(network, 128, 5, padding='valid', activation='relu', regularizer="L2")
+    #print branch11.shape
+    #network = merge([branch11, branch12, branch13], mode='concat', axis=1)
+    #network = tf.expand_dims(network, 2)
+    #network = global_max_pool(network)
 
     branch21 = conv_1d(branch11, 128, 3, padding='valid', activation='relu', regularizer="L2")
-    branch22 = conv_1d(branch12, 128, 3, padding='valid', activation='relu', regularizer="L2")
-    branch23 = conv_1d(branch13, 128, 3, padding='valid', activation='relu', regularizer="L2")
-
+    branch22 = conv_1d(branch12, 128, 4, padding='valid', activation='relu', regularizer="L2")
+    branch23 = conv_1d(branch13, 128, 5, padding='valid', activation='relu', regularizer="L2")
+    print branch21.shape
+    
     network = merge([branch21, branch22, branch23], mode='concat', axis=1)
     network = tf.expand_dims(network, 2)
     network = global_max_pool(network)
-    network = dropout(network, 0.8)
+    network = dropout(network, 0.4)
     network = fully_connected(network, 2, activation='softmax')
     network = regression(network, optimizer='adam', learning_rate=0.001,
                          loss='categorical_crossentropy', name='target')
     # Training
     model = tflearn.DNN(network, tensorboard_verbose=0)
     model.fit(trainX, trainY,
-              n_epoch=5, shuffle=True, validation_set=(testX, testY),
+              n_epoch=10, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=100,run_id="spam")
 
 def do_cnn_wordbag(trainX, testX, trainY, testY):
@@ -180,7 +185,7 @@ def do_cnn_wordbag(trainX, testX, trainY, testY):
     network = global_max_pool(network)
     network = dropout(network, 0.8)
     network = fully_connected(network, 2, activation='softmax')
-    network = regression(network, optimizer='adam', learning_rate=0.001,
+    network = regression(network, optimizer='adam', learning_rate=0.0013,
                          loss='categorical_crossentropy', name='target')
     # Training
     model = tflearn.DNN(network, tensorboard_verbose=0)
@@ -236,29 +241,52 @@ def  get_features_by_tf():
     x=ham+spam
     y=[0]*len(ham)+[1]*len(spam)
     vp=tflearn.data_utils.VocabularyProcessor(max_document_length=max_document_length,
-                                            # min_frequency=0,
-                                            # vocabulary=None,
-                                            # tokenizer_fn=None)
+                                             min_frequency=0,
+                                             vocabulary=None,
+                                             tokenizer_fn=None)
     x=vp.fit_transform(x, unused_y=None)
     x=np.array(list(x))
     return x,y
 
-
+def get_features_by_wordbag_tfidf():
+    ham, spam=load_all_files()
+    x=ham+spam
+    y=[0]*len(ham)+[1]*len(spam)
+    vectorizer = CountVectorizer(binary=False,
+                                 decode_error='ignore',
+                                 strip_accents='ascii',
+                                 max_features=max_features,
+                                 stop_words='english',
+                                 max_df=1.0,
+                                 min_df=1 )
+    print vectorizer
+    x=vectorizer.fit_transform(x)
+    x=x.toarray()
+    transformer = TfidfTransformer(smooth_idf=False)
+    print transformer
+    tfidf = transformer.fit_transform(x)
+    x = tfidf.toarray()
+    return  x,y
 
 if __name__ == "__main__":
     print "Hello spam-mail"
-    # print "get_features_by_wordbag"
-    # x,y=get_features_by_wordbag()
-    # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
+#     print "get_features_by_wordbag"
+#     x,y=get_features_by_wordbag()
+#     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
 
-    # print "get_features_by_wordbag_tfidf"
-    # x,y=get_features_by_wordbag_tfidf()
-    # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
+    #print "get_features_by_wordbag_tfidf"
+    #x,y=get_features_by_wordbag_tfidf()
+    #x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
 
 
-    print "get_features_by_tf"
+    #print "get_features_by_tf"
+    #x,y=get_features_by_tf()
+    #x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
+    
+    print "get_features_by_2gram_tfidf" 
     x,y=get_features_by_2gram_tfidf()
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
     # CNN
-    do_cnn_wordbag(x_train, x_test, y_train, y_test)
+    #do_cnn_wordbag(x_train, x_test, y_train, y_test)
     do_dccnn(x_train, x_test, y_train, y_test)
+    show_diffrent_max_features()
