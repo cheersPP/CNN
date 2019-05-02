@@ -50,7 +50,7 @@ def load_files_from_dir(rootdir):
 def load_all_files():
     ham=[]
     spam=[]
-    for i in range(1,5):
+    for i in range(1,6):
         path="../data/mail/enron%d/ham/" % i
         print "Load %s" % path
         ham+=load_files_from_dir(path)
@@ -165,6 +165,7 @@ def do_dccnn(trainX, testX, trainY, testY):
     model.fit(trainX, trainY,
               n_epoch=3, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=100,run_id="spam")
+    
     y_predict_list = model.predict(testX)
     y_predict=[]
     for i in y_predict_list:
@@ -208,6 +209,46 @@ def do_cnn_wordbag(trainX, testX, trainY, testY):
               n_epoch=5, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=100,run_id="spam")
  
+
+# def do_rnn_wordbag(trainX, testX, trainY, testY):
+    # global max_document_length
+    # print "RNN and wordbag"
+
+    # trainX = pad_sequences(trainX, maxlen=max_document_length, value=0.)
+    # testX = pad_sequences(testX, maxlen=max_document_length, value=0.)
+    # # Converting labels to binary vectors
+    # trainY = to_categorical(trainY, nb_classes=2)
+    # testY = to_categorical(testY, nb_classes=2)
+
+    # # Network building
+    # net = tflearn.input_data([None, max_document_length])
+    # net = tflearn.embedding(net, input_dim=10240000, output_dim=128)
+    # net = tflearn.lstm(net, 128, dropout=0.8)
+    # net = tflearn.fully_connected(net, 2, activation='softmax')
+    # net = tflearn.regression(net, optimizer='adam', learning_rate=0.001,
+                             # loss='categorical_crossentropy')
+
+    # # Training
+    # model = tflearn.DNN(net, tensorboard_verbose=0)
+    # model.fit(trainX, trainY, validation_set=(testX, testY), show_metric=True,
+              # batch_size=10,run_id="spm-run",n_epoch=5)
+
+
+# def do_dnn_wordbag(x_train, x_test, y_train, y_testY):
+    # print "DNN and wordbag"
+
+    # # Building deep neural network
+    # clf = MLPClassifier(solver='lbfgs',
+                        # alpha=1e-5,
+                        # hidden_layer_sizes = (5, 2),
+                        # random_state = 1)
+    # print  clf
+    # clf.fit(x_train, y_train)
+    # y_pred = clf.predict(x_test)
+    # print metrics.accuracy_score(y_test, y_pred)
+    # print metrics.confusion_matrix(y_test, y_pred)
+
+
 
 def  get_features_by_tf():
     global  max_document_length
@@ -258,9 +299,6 @@ def do_metrics(y_test,y_pred):
 
 if __name__ == "__main__":
     print "Hello spam-mail"
-#     print "get_features_by_wordbag"
-#     x,y=get_features_by_wordbag()
-#     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
 
     #print "get_features_by_wordbag_tfidf"
     #x,y=get_features_by_wordbag_tfidf()
