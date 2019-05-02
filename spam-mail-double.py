@@ -50,7 +50,7 @@ def load_files_from_dir(rootdir):
 def load_all_files():
     ham=[]
     spam=[]
-    for i in range(1,2):
+    for i in range(1,5):
         path="../data/mail/enron%d/ham/" % i
         print "Load %s" % path
         ham+=load_files_from_dir(path)
@@ -163,22 +163,8 @@ def do_dccnn(trainX, testX, trainY, testY):
     # Training
     model = tflearn.DNN(network, tensorboard_verbose=0)
     model.fit(trainX, trainY,
-              n_epoch=2, shuffle=True, validation_set=(testX, testY),
+              n_epoch=3, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=100,run_id="spam")
-    
-    y_predict_list = model.predict(testX)
-    y_predict=[]
-    for i in y_predict_list:
-        if i[0] > 0.5:
-            y_predict.append(0)
-        else:
-            y_predict.append(1)
-    print 'y_predict_list:'
-    print y_predict_list
-    print 'y_predict:'
-    print  y_predict
-    print y_test
-    do_metrics(y_test,y_predict)
 
 def do_cnn_wordbag(trainX, testX, trainY, testY):
     global max_document_length
@@ -269,7 +255,7 @@ if __name__ == "__main__":
 
 
     print "get_features_by_tf"
-    x,y=get_features_by_2gram_tfidf()
+    x,y=get_features_by_tf()
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
     # CNN
     #do_cnn_wordbag(x_train, x_test, y_train, y_test)
