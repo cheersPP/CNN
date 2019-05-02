@@ -207,7 +207,7 @@ def do_cnn_wordbag(trainX, testX, trainY, testY):
     model = tflearn.DNN(network, tensorboard_verbose=3)
     model.fit(trainX, trainY,
               n_epoch=5, shuffle=True, validation_set=(testX, testY),
-              show_metric=True, batch_size=100,run_id="spam")
+              show_metric=True, batch_size=32,run_id="spam")
  
 
 # def do_rnn_wordbag(trainX, testX, trainY, testY):
