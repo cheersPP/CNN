@@ -156,7 +156,7 @@ def do_dccnn(trainX, testX, trainY, testY):
     network = merge([branch21, branch22, branch23], mode='concat', axis=1)
     network = tf.expand_dims(network, 2)
     network = global_max_pool(network)
-    network = dropout(network, 0.4)
+    network = dropout(network, 0.5)
     network = fully_connected(network, 2, activation='softmax')
     network = regression(network, optimizer='adam', learning_rate=0.001,
                          loss='categorical_crossentropy', name='target')
