@@ -165,7 +165,7 @@ def do_dccnn(trainX, testX, trainY, testY):
     model = tflearn.DNN(network, tensorboard_verbose=0)
     model.fit(trainX, trainY,
               n_epoch=2, shuffle=True, validation_set=(testX, testY),
-              show_metric=True, batch_size=100,run_id="spam")
+              show_metric=True, batch_size=16,run_id="spam")
     
 #     y_predict_list = model.predict(testX)
 #     y_predict=[]
