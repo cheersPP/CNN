@@ -50,7 +50,7 @@ def load_files_from_dir(rootdir):
 def load_all_files():
     ham=[]
     spam=[]
-    for i in range(1,7):
+    for i in range(1,6):
         path="../data/mail/enron%d/ham/" % i
         print "Load %s" % path
         ham+=load_files_from_dir(path)
