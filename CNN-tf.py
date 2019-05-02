@@ -125,8 +125,6 @@ def do_cnn_tf(trainX, testX, trainY, testY):
     model.fit(trainX, trainY,
               n_epoch=5, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=100,run_id="spam")
-    y_pred=model.predict(testX)
-    do_metrics(testY, y_pred)
 
 if __name__ == "__main__":
     print "Hello spam-mail"
