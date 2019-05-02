@@ -167,7 +167,7 @@ def do_dccnn(trainX, testX, trainY, testY):
     network = global_max_pool(network)
     network = dropout(network, 0.8)
     network = fully_connected(network, 2, activation='softmax')
-    network = regression(network, optimizer='Adam', learning_rate=0.000001,
+    network = regression(network, optimizer='Adam', learning_rate=0,
                          loss='categorical_crossentropy', name='target')
     # Training
     model = tflearn.DNN(network, tensorboard_verbose=0)
