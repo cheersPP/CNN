@@ -20,7 +20,7 @@ from tflearn.data_utils import to_categorical, pad_sequences
 from sklearn.neural_network import MLPClassifier
 from tflearn.layers.normalization import local_response_normalization
 from tensorflow.contrib import learn
-
+from sklearn import metrics
 
 max_features=5000
 max_document_length=100
@@ -59,11 +59,27 @@ def load_all_files():
         spam+=load_files_from_dir(path)
     return ham,spam
 
-
+def get_features_by_wordbag():
+    ham, spam=load_all_files()
+    x=ham+spam
+    y=[0]*len(ham)+[1]*len(spam)
+    vectorizer = CountVectorizer(
+                                 decode_error='ignore',
+                                 strip_accents='ascii',
+                                 max_features=max_features,
+                                 stop_words='english',
+                                 max_df=1.0,
+                                 min_df=1 )
+    print vectorizer
+    x=vectorizer.fit_transform(x)
+    x=x.toarray()
+    return x,y
+##双层卷积
 def do_dccnn(trainX, testX, trainY, testY):
     global max_document_length
     print "Double Convolution CNN "
     y = trainY+testY
+    y_test = testY
     max_sequence = len(y)
 
     trainX = pad_sequences(trainX, maxlen=max_document_length, value=0.)
@@ -71,6 +87,7 @@ def do_dccnn(trainX, testX, trainY, testY):
     # Converting labels to binary vectors
     trainY = to_categorical(trainY, nb_classes=2)
     testY = to_categorical(testY, nb_classes=2)
+    
 
     # Building convolutional network
     network = input_data(shape=[None,max_document_length], name='input')
@@ -79,23 +96,42 @@ def do_dccnn(trainX, testX, trainY, testY):
     branch11 = conv_1d(network, 128, 3, padding='valid', activation='relu', regularizer="L2")
     branch12 = conv_1d(network, 128, 4, padding='valid', activation='relu', regularizer="L2")
     branch13 = conv_1d(network, 128, 5, padding='valid', activation='relu', regularizer="L2")
+    #print branch11.shape
+    #network = merge([branch11, branch12, branch13], mode='concat', axis=1)
+    #network = tf.expand_dims(network, 2)
+    #network = global_max_pool(network)
 
     branch21 = conv_1d(branch11, 128, 3, padding='valid', activation='relu', regularizer="L2")
-    branch22 = conv_1d(branch12, 128, 3, padding='valid', activation='relu', regularizer="L2")
-    branch23 = conv_1d(branch13, 128, 3, padding='valid', activation='relu', regularizer="L2")
-
+    branch22 = conv_1d(branch12, 128, 4, padding='valid', activation='relu', regularizer="L2")
+    branch23 = conv_1d(branch13, 128, 5, padding='valid', activation='relu', regularizer="L2")
+    print branch21.shape
+    
     network = merge([branch21, branch22, branch23], mode='concat', axis=1)
     network = tf.expand_dims(network, 2)
     network = global_max_pool(network)
-    network = dropout(network, 0.8)
+    network = dropout(network, 0.4)
     network = fully_connected(network, 2, activation='softmax')
     network = regression(network, optimizer='adam', learning_rate=0.001,
                          loss='categorical_crossentropy', name='target')
     # Training
     model = tflearn.DNN(network, tensorboard_verbose=0)
     model.fit(trainX, trainY,
-              n_epoch=5, shuffle=True, validation_set=(testX, testY),
+              n_epoch=2, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=100,run_id="spam")
+    
+    y_predict_list = model.predict(testX)
+    y_predict=[]
+    for i in y_predict_list:
+        if i[0] > 0.5:
+            y_predict.append(0)
+        else:
+            y_predict.append(1)
+    print 'y_predict_list:'
+    print y_predict_list
+    print 'y_predict:'
+    print  y_predict
+    print y_test
+    do_metrics(y_test,y_predict)
 
 def  get_features_by_tf():
     global  max_document_length
@@ -105,19 +141,18 @@ def  get_features_by_tf():
     x=ham+spam
     y=[0]*len(ham)+[1]*len(spam)
     vp=tflearn.data_utils.VocabularyProcessor(max_document_length=max_document_length,
-                                              min_frequency=0,
-                                              vocabulary=None,
-                                              tokenizer_fn=None)
+                                             min_frequency=0,
+                                             vocabulary=None,
+                                             tokenizer_fn=None)
     x=vp.fit_transform(x, unused_y=None)
     x=np.array(list(x))
     return x,y
 
-
-
 if __name__ == "__main__":
     print "Hello spam-mail"
-    print "get_features_by_tf"
-    x,y=get_features_by_tf()
+
+    #print "get_features_by_tf"
+    x,y=get_features_by_2gram_tfidf()
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
-    
     do_dccnn(x_train, x_test, y_train, y_test)
+    #show_diffrent_max_features()
