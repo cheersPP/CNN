@@ -82,7 +82,7 @@ def show_diffrent_max_features():
     for i in range(1000,20000,2000):
         max_features=i
         print "max_features=%d" % i
-        x, y = get_features_by_wordbag()
+        x, y = get_features_by_tf()
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.4, random_state=0)
         gnb = GaussianNB()
         gnb.fit(x_train, y_train)
@@ -96,18 +96,6 @@ def show_diffrent_max_features():
     plt.title("metrics.accuracy_score VS max_features")
     plt.legend()
     plt.show()
-    
-def do_metrics(y_test,y_pred): 
-    print "metrics.accuracy_score:" 
-    print metrics.accuracy_score(y_test, y_pred) 
-    print "metrics.confusion_matrix:" 
-    print metrics.confusion_matrix(y_test, y_pred) 
-    print "metrics.precision_score:" 
-    print metrics.precision_score(y_test, y_pred) 
-    print "metrics.recall_score:" 
-    print metrics.recall_score(y_test, y_pred) 
-    print "metrics.f1_score:" 
-    print metrics.f1_score(y_test,y_pred) 
     
 def do_cnn_tf(trainX, testX, trainY, testY):
     global max_document_length
@@ -146,3 +134,4 @@ if __name__ == "__main__":
     x,y=get_features_by_tf()
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
     do_cnn_tf(x_train, x_test, y_train, y_test)
+    show_diffrent_max_features()
