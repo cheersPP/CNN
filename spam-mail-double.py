@@ -151,8 +151,8 @@ def  get_features_by_tf():
 if __name__ == "__main__":
     print "Hello spam-mail"
 
-    #print "get_features_by_tf"
-    x,y=get_features_by_2gram_tfidf()
+    print "get_features_by_tf"
+    x,y=get_features_by_tf()
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
     do_dccnn(x_train, x_test, y_train, y_test)
     #show_diffrent_max_features()
