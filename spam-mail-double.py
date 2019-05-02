@@ -125,9 +125,9 @@ def get_features_by_2gram_tfidf():
 def do_dccnn(trainX, testX, trainY, testY):
     global max_document_length
     print "Double Convolution CNN "
-    y = trainY+testY
-    y_test = testY
-    max_sequence = len(y)
+#     y = trainY+testY
+#     y_test = testY
+#     max_sequence = len(y)
 
     trainX = pad_sequences(trainX, maxlen=max_document_length, value=0.)
     testX = pad_sequences(testX, maxlen=max_document_length, value=0.)
@@ -138,7 +138,8 @@ def do_dccnn(trainX, testX, trainY, testY):
 
     # Building convolutional network
     network = input_data(shape=[None,max_document_length], name='input')
-    network = tflearn.embedding(network, input_dim=max_sequence+1, output_dim=128)
+    network = tflearn.embedding(network, input_dim=1000000, output_dim=128)
+#     network = tflearn.embedding(network, input_dim=max_sequence+1, output_dim=128)
 
     branch11 = conv_1d(network, 128, 3, padding='valid', activation='relu', regularizer="L2")
     branch12 = conv_1d(network, 128, 4, padding='valid', activation='relu', regularizer="L2")
@@ -156,7 +157,7 @@ def do_dccnn(trainX, testX, trainY, testY):
     network = merge([branch21, branch22, branch23], mode='concat', axis=1)
     network = tf.expand_dims(network, 2)
     network = global_max_pool(network)
-    network = dropout(network, 0.5)
+    network = dropout(network, 0.8)
     network = fully_connected(network, 2, activation='softmax')
     network = regression(network, optimizer='Adadelta', learning_rate=0.001,
                          loss='categorical_crossentropy', name='target')
@@ -166,19 +167,19 @@ def do_dccnn(trainX, testX, trainY, testY):
               n_epoch=2, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=32,run_id="spam")
     
-    y_predict_list = model.predict(testX)
-    y_predict=[]
-    for i in y_predict_list:
-        if i[0] > 0.5:
-            y_predict.append(0)
-        else:
-            y_predict.append(1)
-    print 'y_predict_list:'
-    print y_predict_list
-    print 'y_predict:'
-    print  y_predict
-    print y_test
-    do_metrics(y_test,y_predict)
+#     y_predict_list = model.predict(testX)
+#     y_predict=[]
+#     for i in y_predict_list:
+#         if i[0] > 0.5:
+#             y_predict.append(0)
+#         else:
+#             y_predict.append(1)
+#     print 'y_predict_list:'
+#     print y_predict_list
+#     print 'y_predict:'
+#     print  y_predict
+#     print y_test
+#     do_metrics(y_test,y_predict)
 
 def do_cnn_wordbag(trainX, testX, trainY, testY):
     global max_document_length
@@ -207,7 +208,7 @@ def do_cnn_wordbag(trainX, testX, trainY, testY):
     model = tflearn.DNN(network, tensorboard_verbose=3)
     model.fit(trainX, trainY,
               n_epoch=5, shuffle=True, validation_set=(testX, testY),
-              show_metric=True, batch_size=32,run_id="spam")
+              show_metric=True, batch_size=100,run_id="spam")
  
 
 # def do_rnn_wordbag(trainX, testX, trainY, testY):
