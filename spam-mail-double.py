@@ -50,7 +50,7 @@ def load_files_from_dir(rootdir):
 def load_all_files():
     ham=[]
     spam=[]
-    for i in range(1,6):
+    for i in range(1,2):
         path="../data/mail/enron%d/ham/" % i
         print "Load %s" % path
         ham+=load_files_from_dir(path)
@@ -141,17 +141,25 @@ def do_dccnn(trainX, testX, trainY, testY):
     network = tflearn.embedding(network, input_dim=1000000, output_dim=128)
 #     network = tflearn.embedding(network, input_dim=max_sequence+1, output_dim=128)
 
+    print 'branch11:'
     branch11 = conv_1d(network, 128, 3, padding='valid', activation='relu', regularizer="L2")
+    print branch11
+    print 'branch12:'
     branch12 = conv_1d(network, 128, 4, padding='valid', activation='relu', regularizer="L2")
+    print branch12
     branch13 = conv_1d(network, 128, 5, padding='valid', activation='relu', regularizer="L2")
+    print branch13
     #print branch11.shape
     #network = merge([branch11, branch12, branch13], mode='concat', axis=1)
     #network = tf.expand_dims(network, 2)
     #network = global_max_pool(network)
 
     branch21 = conv_1d(branch11, 128, 3, padding='valid', activation='relu', regularizer="L2")
+    print branch21
     branch22 = conv_1d(branch12, 128, 4, padding='valid', activation='relu', regularizer="L2")
+    print branch22
     branch23 = conv_1d(branch13, 128, 5, padding='valid', activation='relu', regularizer="L2")
+    print branch23
     print branch21.shape
     
     network = merge([branch21, branch22, branch23], mode='concat', axis=1)
@@ -159,13 +167,13 @@ def do_dccnn(trainX, testX, trainY, testY):
     network = global_max_pool(network)
     network = dropout(network, 0.8)
     network = fully_connected(network, 2, activation='softmax')
-    network = regression(network, optimizer='Adam', learning_rate=0.00001,
+    network = regression(network, optimizer='Adam', learning_rate=0.0001,
                          loss='categorical_crossentropy', name='target')
     # Training
     model = tflearn.DNN(network, tensorboard_verbose=0)
     model.fit(trainX, trainY,
               n_epoch=2, shuffle=True, validation_set=(testX, testY),
-              show_metric=True, batch_size=16,run_id="spam")
+              show_metric=True, batch_size=100,run_id="spam")
     
 #     y_predict_list = model.predict(testX)
 #     y_predict=[]
