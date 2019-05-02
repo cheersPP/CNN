@@ -156,15 +156,15 @@ def do_dccnn(trainX, testX, trainY, testY):
     network = merge([branch21, branch22, branch23], mode='concat', axis=1)
     network = tf.expand_dims(network, 2)
     network = global_max_pool(network)
-    network = dropout(network, 0.8)
+    network = dropout(network, 0.5)
     network = fully_connected(network, 2, activation='softmax')
-    network = regression(network, optimizer='adam', learning_rate=0.001,
+    network = regression(network, optimizer='Adadelta', learning_rate=0.001,
                          loss='categorical_crossentropy', name='target')
     # Training
     model = tflearn.DNN(network, tensorboard_verbose=0)
     model.fit(trainX, trainY,
               n_epoch=2, shuffle=True, validation_set=(testX, testY),
-              show_metric=True, batch_size=100,run_id="spam")
+              show_metric=True, batch_size=32,run_id="spam")
     
     y_predict_list = model.predict(testX)
     y_predict=[]
