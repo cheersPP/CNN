@@ -59,27 +59,27 @@ def load_all_files():
         spam+=load_files_from_dir(path)
     return ham,spam
 
-def show_diffrent_max_features():
-    global max_features
-    a=[]
-    b=[]
-    for i in range(1000,20000,2000):
-        max_features=i
-        print "max_features=%d" % i
-        x, y = get_features_by_wordbag()
-        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.4, random_state=0)
-        gnb = GaussianNB()
-        gnb.fit(x_train, y_train)
-        y_pred = gnb.predict(x_test)
-        score=metrics.accuracy_score(y_test, y_pred)
-        a.append(max_features)
-        b.append(score)
-        plt.plot(a, b, 'r')
-    plt.xlabel("max_features")
-    plt.ylabel("metrics.accuracy_score")
-    plt.title("metrics.accuracy_score VS max_features")
-    plt.legend()
-    plt.show()
+# def show_diffrent_max_features():
+#     global max_features
+#     a=[]
+#     b=[]
+#     for i in range(1000,20000,2000):
+#         max_features=i
+#         print "max_features=%d" % i
+#         x, y = get_features_by_wordbag()
+#         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.4, random_state=0)
+#         gnb = GaussianNB()
+#         gnb.fit(x_train, y_train)
+#         y_pred = gnb.predict(x_test)
+#         score=metrics.accuracy_score(y_test, y_pred)
+#         a.append(max_features)
+#         b.append(score)
+#         plt.plot(a, b, 'r')
+#     plt.xlabel("max_features")
+#     plt.ylabel("metrics.accuracy_score")
+#     plt.title("metrics.accuracy_score VS max_features")
+#     plt.legend()
+#     plt.show()
 
 ##双层卷积
 def do_dccnn(trainX, testX, trainY, testY):
@@ -98,52 +98,29 @@ def do_dccnn(trainX, testX, trainY, testY):
     network = input_data(shape=[None,max_document_length], name='input')
     network = tflearn.embedding(network, input_dim=max_sequence+1, output_dim=128)
 
-    branch11 = conv_1d(network, 128, 3, padding='valid', activation='relu', regularizer="L2")
-    branch12 = conv_1d(network, 128, 4, padding='valid', activation='relu', regularizer="L2")
-    branch13 = conv_1d(network, 128, 5, padding='valid', activation='relu', regularizer="L2")
+#     branch11 = conv_1d(network, 128, 3, padding='valid', activation='relu', regularizer="L2")
+#     branch12 = conv_1d(network, 128, 4, padding='valid', activation='relu', regularizer="L2")
+#     branch13 = conv_1d(network, 128, 5, padding='valid', activation='relu', regularizer="L2")
     #print branch11.shape
     #network = merge([branch11, branch12, branch13], mode='concat', axis=1)
     #network = tf.expand_dims(network, 2)
-    #network = global_max_pool(network)
+    #network = global_max_pool(network)    
+    branch11 = conv_1d(network, 128, 3, padding='valid', activation='tanh', regularizer="L2")
+    branch12 = conv_1d(network, 128, 4, padding='valid', activation='tanh', regularizer="L2")
+    branch13 = conv_1d(network, 128, 5, padding='valid', activation='tanh', regularizer="L2")
 
-    branch21 = conv_1d(branch11, 128, 3, padding='valid', activation='relu', regularizer="L2")
-    branch22 = conv_1d(branch12, 128, 4, padding='valid', activation='relu', regularizer="L2")
-    branch23 = conv_1d(branch13, 128, 5, padding='valid', activation='relu', regularizer="L2")
+#     branch21 = conv_1d(branch11, 128, 3, padding='valid', activation='relu', regularizer="L2")
+#     branch22 = conv_1d(branch12, 128, 4, padding='valid', activation='relu', regularizer="L2")
+#     branch23 = conv_1d(branch13, 128, 5, padding='valid', activation='relu', regularizer="L2")
+    branch21 = conv_1d(branch11, 128, 3, padding='valid', activation='tanh', regularizer="L2")
+    branch22 = conv_1d(branch12, 128, 4, padding='valid', activation='tanh', regularizer="L2")
+    branch23 = conv_1d(branch13, 128, 5, padding='valid', activation='tanh', regularizer="L2")
     print branch21.shape
     
     network = merge([branch21, branch22, branch23], mode='concat', axis=1)
     network = tf.expand_dims(network, 2)
     network = global_max_pool(network)
     network = dropout(network, 0.4)
-    network = fully_connected(network, 2, activation='softmax')
-    network = regression(network, optimizer='adam', learning_rate=0.0013,
-                         loss='categorical_crossentropy', name='target')
-    # Training
-    model = tflearn.DNN(network, tensorboard_verbose=0)
-    model.fit(trainX, trainY,
-              n_epoch=20, shuffle=True, validation_set=(testX, testY),
-              show_metric=True, batch_size=100,run_id="spam")
-
-def do_cnn_wordbag(trainX, testX, trainY, testY):
-    global max_document_length
-    print "CNN"
-
-    trainX = pad_sequences(trainX, maxlen=max_document_length, value=0.)
-    testX = pad_sequences(testX, maxlen=max_document_length, value=0.)
-    # Converting labels to binary vectors
-    trainY = to_categorical(trainY, nb_classes=2)
-    testY = to_categorical(testY, nb_classes=2)
-
-    # Building convolutional network
-    network = input_data(shape=[None,max_document_length], name='input')
-    network = tflearn.embedding(network, input_dim=1000000, output_dim=128)
-    branch1 = conv_1d(network, 128, 3, padding='valid', activation='relu', regularizer="L2")
-    branch2 = conv_1d(network, 128, 4, padding='valid', activation='relu', regularizer="L2")
-    branch3 = conv_1d(network, 128, 5, padding='valid', activation='relu', regularizer="L2")
-    network = merge([branch1, branch2, branch3], mode='concat', axis=1)
-    network = tf.expand_dims(network, 2)
-    network = global_max_pool(network)
-    network = dropout(network, 0.8)
     network = fully_connected(network, 2, activation='softmax')
     network = regression(network, optimizer='adam', learning_rate=0.0013,
                          loss='categorical_crossentropy', name='target')
