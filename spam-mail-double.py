@@ -300,14 +300,15 @@ def do_metrics(y_test,y_pred):
 if __name__ == "__main__":
     print "Hello spam-mail"
 
-    #print "get_features_by_wordbag_tfidf"
-    #x,y=get_features_by_wordbag_tfidf()
-    #x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
-
-
-    print "get_features_by_tf"
-    x,y=get_features_by_tf()
+#     print "get_features_by_wordbag_tfidf"
+#     x,y=get_features_by_wordbag_tfidf()
+#     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
+    x,y=get_features_by_2gram_tfidf()
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
+
+#     print "get_features_by_tf"
+#     x,y=get_features_by_tf()
+#     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
     # CNN
     #do_cnn_wordbag(x_train, x_test, y_train, y_test)
     do_dccnn(x_train, x_test, y_train, y_test)
