@@ -165,6 +165,19 @@ def do_dccnn(trainX, testX, trainY, testY):
     model.fit(trainX, trainY,
               n_epoch=3, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=100,run_id="spam")
+    y_predict_list = model.predict(testX)
+    y_predict=[]
+    for i in y_predict_list:
+        if i[0] > 0.5:
+            y_predict.append(0)
+        else:
+            y_predict.append(1)
+    print 'y_predict_list:'
+    print y_predict_list
+    print 'y_predict:'
+    print  y_predict
+    print y_test
+    do_metrics(y_test,y_predict)
 
 def do_cnn_wordbag(trainX, testX, trainY, testY):
     global max_document_length
