@@ -163,7 +163,7 @@ def do_dccnn(trainX, testX, trainY, testY):
     # Training
     model = tflearn.DNN(network, tensorboard_verbose=0)
     model.fit(trainX, trainY,
-              n_epoch=3, shuffle=True, validation_set=(testX, testY),
+              n_epoch=10, shuffle=True, validation_set=(testX, testY),
               show_metric=True, batch_size=100,run_id="spam")
     
     y_predict_list = model.predict(testX)
