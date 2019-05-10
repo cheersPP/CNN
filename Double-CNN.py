@@ -50,7 +50,7 @@ def load_files_from_dir(rootdir):
 def load_all_files():
     ham=[]
     spam=[]
-    for i in range(1,2):
+    for i in range(1,7):
         path="../data/mail/enron%d/ham/" % i
         print "Load %s" % path
         ham+=load_files_from_dir(path)
@@ -58,22 +58,6 @@ def load_all_files():
         print "Load %s" % path
         spam+=load_files_from_dir(path)
     return ham,spam
-
-def get_features_by_wordbag():
-    ham, spam=load_all_files()
-    x=ham+spam
-    y=[0]*len(ham)+[1]*len(spam)
-    vectorizer = CountVectorizer(
-                                 decode_error='ignore',
-                                 strip_accents='ascii',
-                                 max_features=max_features,
-                                 stop_words='english',
-                                 max_df=1.0,
-                                 min_df=1 )
-    print vectorizer
-    x=vectorizer.fit_transform(x)
-    x=x.toarray()
-    return x,y
 
 def show_diffrent_max_features():
     global max_features
@@ -312,12 +296,12 @@ if __name__ == "__main__":
 #     print "get_features_by_wordbag_tfidf"
 #     x,y=get_features_by_wordbag_tfidf()
 #     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
-    x,y=get_features_by_2gram_tfidf()
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
-
-#     print "get_features_by_tf"
-#     x,y=get_features_by_tf()
+#     x,y=get_features_by_2gram_tfidf()
 #     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
+
+    print "get_features_by_tf"
+    x,y=get_features_by_tf()
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.4, random_state = 0)
     # CNN
     #do_cnn_wordbag(x_train, x_test, y_train, y_test)
     do_dccnn(x_train, x_test, y_train, y_test)
